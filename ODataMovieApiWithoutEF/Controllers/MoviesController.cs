@@ -55,7 +55,7 @@ namespace ODataMovieApiWithoutEF.Controllers
         {
             if (ModelState.IsValid == true)
             {
-                _movieRepo.Edit(id, movie);
+                _movieRepo.Update(id, movie);
             }
         }
 
