@@ -6,7 +6,7 @@ namespace ODataMovieApiWithoutEF.Repository
     {
         List<Movie> GetMovies();    
         bool Add(Movie movie);
-        bool Update(Movie movie);
+        bool Update(int id, Movie movie);
         bool Delete(int movieId);
     }
 }
