@@ -22,57 +22,118 @@ namespace ODataMovieApiWithoutEF.Controllers
         [EnableQuery]
         [HttpGet(nameof(GetById))]
         [ProducesResponseType(200, Type = typeof(Movie))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(404)]
         [ProducesDefaultResponseType]
         public IEnumerable<Movie> GetById(int Id)
         {
-            var result = _movieRepo.GetMovies().Where(model => model.Id == Id);
-
-            if (result == null)
+            if(Id < 0)
             {
-                return (IEnumerable<Movie>)NotFound();
+                return (IEnumerable<Movie>)BadRequest();
+            }
+            var movie = _movieRepo.GetMovies().Where(model => model.Id == Id);
+
+            if (movie == null)
+            {
+                ModelState.AddModelError("", $"Movie with Id: {Id} is not available in DB");
+                return (IEnumerable<Movie>)StatusCode(404, ModelState);
             }
 
-            return result;
+            return movie;
         }
 
-        //Post
-        public void Post([FromBody] Movie movie)
+        /// <summary>
+        /// Create a new movie
+        /// </summary>
+        /// <param name="movie"></param>
+        [EnableQuery]
+        [ProducesResponseType(201, Type = typeof(Movie))]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult Post([FromBody] Movie movie)
         {
-            if (ModelState.IsValid == true)
+            if(movie == null)
             {
-                _movieRepo.Add(movie);
+                return BadRequest(ModelState);
             }
-            else
-            {
 
+            if (_movieRepo.MovieExists(movie.Id))
+            {
+                ModelState.AddModelError("", "Movie already Exist");
+                return StatusCode(500, ModelState);
             }
+
+            if (!_movieRepo.Add(movie))
+            {
+                ModelState.AddModelError("", $"Something went wrong while saving movie record of {movie.Title}");
+                return StatusCode(500, ModelState);
+            }
+            
+            return Created(movie);
+            
         }
 
+        /// <summary>
+        /// Update a movie
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="movie"></param>
         [HttpPut("{id}")]
         [EnableQuery]
-        public void Put(int id, [FromBody] Movie movie)
+        [ProducesResponseType(200, Type = typeof(Movie))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult Put(int id, [FromBody] Movie movie)
         {
-            if (ModelState.IsValid == true)
+            if(movie == null || id != movie.Id)
             {
-                _movieRepo.Update(id, movie);
+                return BadRequest(ModelState);
             }
+
+            if(!_movieRepo.Update(id, movie))
+            {
+                ModelState.AddModelError("", $"Something went wrong while updating movie : {movie.Title}");
+                return StatusCode(500, ModelState);
+            }
+
+            return Updated(movie);
         }
 
 
-        //Delete 
+        /// <summary>
+        /// Delete a movie
+        /// </summary>
+        /// <param name="movieId"></param>
+        /// <returns></returns>
         [HttpDelete("{movieId}")]
         [EnableQuery]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public void Delete(int movieId)
+        public IActionResult Delete(int movieId)
         {
-            if (ModelState.IsValid == true)
+            if (movieId < 0)
             {
-                _movieRepo.Delete(movieId);
+                return BadRequest();
             }
+            if(!_movieRepo.MovieExists(movieId))
+            {
+                ModelState.AddModelError("", "Movie to be deleted doesn't Exist");
+                return StatusCode(500, ModelState);
+            }
+            if(!_movieRepo.Delete(movieId))
+            {
+                ModelState.AddModelError("", $"Something went wrong while deleting movie");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok();
         }
 
     }
