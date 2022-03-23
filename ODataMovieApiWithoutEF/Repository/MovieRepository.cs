@@ -28,7 +28,7 @@ namespace ODataMovieApiWithoutEF.Repository
                                                 Title = Convert.ToString(dr[1]),
                                                 Genre = Convert.ToString(dr[2]),
                                                 ReleaseDate = Convert.ToDateTime(dr[3]),
-                                                Diector = Convert.ToString(dr[4]),
+                                                Director = Convert.ToString(dr[4]),
                         });
                     }
                 }
@@ -40,7 +40,7 @@ namespace ODataMovieApiWithoutEF.Repository
         //Post
         public bool Add(Movie movie)
         {
-            string query = "insert into Movies values('" + movie.Title + "','" + movie.Genre + "', '" + movie.ReleaseDate + "', '" + movie.Director + "')";
+            string query = "insert into Movies values('"+ movie.Id + "','" + movie.Title + "','" + movie.Genre + "', '" + movie.ReleaseDate + "', '" + movie.Director + "')";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query))
@@ -64,7 +64,7 @@ namespace ODataMovieApiWithoutEF.Repository
         //update
         public bool Update(int id, Movie movie)
         {
-            string query = "update Students set Title= '" + movie.Title + "', Genre='" + movie.Genre + "', ReleaseDate='" + movie.ReleaseDate + "', Director='" + movie.Director + "' where Id='" + id + "' ";
+            string query = "update Movies set Title= '" + movie.Title + "', Genre='" + movie.Genre + "', ReleaseDate='" + movie.ReleaseDate + "', Diector='" + movie.Director + "' where Id='" + id + "' ";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query))
@@ -109,6 +109,14 @@ namespace ODataMovieApiWithoutEF.Repository
             }
         }
 
-        
+        public bool MovieExists(int movieId)
+        {
+            var result = GetMovies().Where(x => x.Id == movieId);
+            if(result.Count() > 0)
+                return true;
+            else
+                return false;
+          //  return (result == null) ? false : true;
+        }
     }
 }
