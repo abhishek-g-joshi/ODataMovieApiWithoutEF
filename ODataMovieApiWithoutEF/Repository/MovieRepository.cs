@@ -7,15 +7,7 @@ namespace ODataMovieApiWithoutEF.Repository
     public class MovieRepository : IMovieRepository
     {
         string connectionString = "Data Source=(LocalDb)\\MSSQLLocalDB;Database=MovieApi;Trusted_Connection=True;MultipleActiveResultSets=true";
-        public bool Add(Movie movie)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Delete(int movieId)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public List<Movie> GetMovies()
         {
@@ -44,10 +36,79 @@ namespace ODataMovieApiWithoutEF.Repository
             }
             return movies;
         }
-
-        public bool Update(Movie movie)
+        
+        //Post
+        public bool Add(Movie movie)
         {
-            throw new NotImplementedException();
+            string query = "insert into Movies values('" + movie.Title + "','" + movie.Genre + "', '" + movie.ReleaseDate + "', '" + movie.Director + "')";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(query))
+                {
+                    command.Connection = connection;
+                    if (connection.State == ConnectionState.Closed)
+                        connection.Open();
+                    int i = command.ExecuteNonQuery();
+                    if (i >= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
         }
+
+        //update
+        public bool Update(int id, Movie movie)
+        {
+            string query = "update Students set Title= '" + movie.Title + "', Genre='" + movie.Genre + "', ReleaseDate='" + movie.ReleaseDate + "', Director='" + movie.Director + "' where Id='" + id + "' ";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(query))
+                {
+                    command.Connection = connection;
+                    if (connection.State == ConnectionState.Closed)
+                        connection.Open();
+                    int i = command.ExecuteNonQuery();
+                    if (i >= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        //Delete Movie object
+        public bool Delete(int movieId)
+        {
+            string query = "delete Movies where Id='" + movieId + "'";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(query))
+                {
+                    command.Connection = connection;
+                    if (connection.State == ConnectionState.Closed)
+                        connection.Open();
+                    int i = command.ExecuteNonQuery();
+                    if (i >= 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        
     }
 }
