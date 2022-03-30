@@ -20,7 +20,7 @@ namespace ODataMovieApiWithoutEF.Controllers
         }
 
         [EnableQuery]
-        [HttpGet(nameof(GetById))]
+        [HttpGet("v1/Movies/{Id}")]
         [ProducesResponseType(200, Type = typeof(Movie))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(404)]
@@ -80,7 +80,7 @@ namespace ODataMovieApiWithoutEF.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <param name="movie"></param>
-        [HttpPut("{id}")]
+        [HttpPut("v1/Movies/{id}")]
         [EnableQuery]
         [ProducesResponseType(200, Type = typeof(Movie))]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -109,7 +109,7 @@ namespace ODataMovieApiWithoutEF.Controllers
         /// </summary>
         /// <param name="movieId"></param>
         /// <returns></returns>
-        [HttpDelete("{movieId}")]
+        [HttpDelete("v1/Movies/{movieId}")]
         [EnableQuery]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
